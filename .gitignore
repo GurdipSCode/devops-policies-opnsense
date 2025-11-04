@@ -1,0 +1,198 @@
+# OPNsense Test Suite - Git Ignore File
+# Prevents committing sensitive data and temporary files
+
+# ============================================================================
+# CRITICAL: Security-sensitive files
+# ============================================================================
+config.yaml
+config.yml
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.yaml
+credentials.json
+.env
+.env.local
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# ============================================================================
+# Testing
+# ============================================================================
+# Pytest
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+pytest_debug.log
+test-execution.log
+*.log
+
+# Test reports
+report.html
+test-results.xml
+results.xml
+coverage.xml
+*.xml
+test-reports/
+allure-results/
+allure-report/
+
+# JSON reports
+*.json
+!package.json
+!package-lock.json
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# Temporary Files
+# ============================================================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+tmp/
+temp/
+
+# ============================================================================
+# Documentation Build
+# ============================================================================
+docs/_build/
+docs/_static/
+docs/_templates/
+site/
+
+# ============================================================================
+# TeamCity
+# ============================================================================
+.teamcity/
+buildAgent/
+buildServer/
+
+# ============================================================================
+# CI/CD
+# ============================================================================
+.gitlab-ci-local/
+.github/workflows/*.local.yml
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+# OPNsense specific temp files
+opnsense_*.xml
+firewall_backup_*.xml
+system_config_*.xml
+
+# Test data that shouldn't be committed
+test_data/sensitive/
+dumps/
+snapshots/
+
+# Local configuration overrides
+config.local.yaml
+config.test.yaml
+config.dev.yaml
+
+# SSH keys (if stored in project)
+*.pub
+id_rsa
+id_ed25519
+known_hosts
+
+# ============================================================================
+# Allow These Files (Exceptions)
+# ============================================================================
+!config.example.yaml
+!config.template.yaml
+!.gitkeep
