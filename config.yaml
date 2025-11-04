@@ -1,0 +1,306 @@
+# OPNsense Configuration Test Suite - Configuration File
+# 
+# SECURITY WARNING: This file contains sensitive connection information.
+# - Never commit this file to version control with real credentials
+# - Use environment variables in CI/CD pipelines
+# - Set restrictive file permissions (chmod 600 config.yaml)
+
+# =============================================================================
+# OPNsense Connection Settings
+# =============================================================================
+opnsense:
+  # Firewall hostname or IP address
+  host: "192.168.1.1"
+  
+  # API Authentication (preferred method)
+  # Generate API keys in OPNsense: System -> Access -> Users -> Edit User -> API Keys
+  api_key: "your-api-key-here"
+  api_secret: "your-api-secret-here"
+  
+  # SSH Authentication (for advanced tests)
+  ssh_user: "root"
+  ssh_password: "your-ssh-password"  # Use ssh_key_path instead for better security
+  ssh_key_path: ""  # Path to SSH private key (e.g., ~/.ssh/id_rsa)
+  ssh_port: 22
+  
+  # Connection Settings
+  port: 443
+  verify_ssl: false  # Set to true if using valid SSL certificate
+  timeout: 30  # Connection timeout in seconds
+
+# =============================================================================
+# Environment Configuration
+# =============================================================================
+environment: "production"  # Options: production, staging, development
+
+# =============================================================================
+# Expected System Configuration
+# =============================================================================
+expected_config:
+  # System Settings
+  hostname: "fw-001"
+  domain: "example.com"
+  timezone: "America/New_York"
+  
+  # DNS Configuration
+  dns_servers:
+    - "8.8.8.8"
+    - "8.8.4.4"
+  
+  # NTP Servers
+  ntp_servers:
+    - "0.opnsense.pool.ntp.org"
+    - "1.opnsense.pool.ntp.org"
+  
+  # Interface Configuration
+  interfaces:
+    - name: "wan"
+      description: "WAN Interface"
+      type: "physical"
+      ipaddr: "dhcp"  # or static IP
+      gateway: "auto"
+      
+    - name: "lan"
+      description: "LAN Interface"
+      type: "physical"
+      ipaddr: "192.168.1.1"
+      subnet: 24
+      gateway: ""
+      
+    - name: "opt1"
+      description: "DMZ"
+      type: "physical"
+      ipaddr: "10.0.1.1"
+      subnet: 24
+      gateway: ""
+      enabled: true
+
+  # VLAN Configuration (if applicable)
+  vlans:
+    - vlan_id: 10
+      parent_interface: "lan"
+      description: "Management VLAN"
+      
+    - vlan_id: 20
+      parent_interface: "lan"
+      description: "Guest VLAN"
+
+# =============================================================================
+# Security Policy Requirements
+# =============================================================================
+security_policy:
+  # Minimum OPNsense version required
+  min_opnsense_version: "23.7"
+  
+  # Logging Requirements
+  require_remote_logging: true
+  remote_syslog_server: "syslog.example.com"
+  
+  # Intrusion Detection/Prevention
+  require_ids: true
+  ids_mode: "IPS"  # IDS or IPS
+  
+  # VPN Requirements
+  vpn_required: true
+  min_vpn_encryption: "AES256"
+  require_perfect_forward_secrecy: true
+  
+  # Certificate Requirements
+  max_cert_age_days: 365
+  cert_expiry_warning_days: 30
+  allow_self_signed: false  # Set to true for dev/staging
+  
+  # Service Requirements
+  required_services:
+    - "sshd"
+    - "unbound"  # DNS resolver
+    - "syslogd"
+  
+  # Optional: Whitelist of allowed services
+  allowed_services:
+    - "sshd"
+    - "unbound"
+    - "dhcpd"
+    - "ntpd"
+    - "syslogd"
+    - "openvpn"
+    - "ipsec"
+  
+  # SSH Security
+  ssh_settings:
+    permit_root_login: "prohibit-password"  # no, prohibit-password, or yes
+    password_authentication: "no"  # Use key-based auth
+    min_protocol_version: 2
+    required_ciphers:
+      - "aes256-gcm@openssh.com"
+      - "chacha20-poly1305@openssh.com"
+  
+  # Firewall Policy
+  firewall_rules:
+    require_descriptions: true
+    min_description_coverage: 80  # Percentage of rules with descriptions
+    allow_any_any: false
+    require_wan_default_deny: true
+    max_disabled_rules: 10
+  
+  # Network Security
+  network_security:
+    allow_promiscuous_mode: false
+    require_antispoofing: true
+    block_private_networks_on_wan: true
+    block_bogon_networks: true
+  
+  # Access Control
+  access_control:
+    management_interface: "lan"  # Only allow management from LAN
+    restrict_admin_access: true
+    require_2fa: false  # Two-factor authentication
+
+# =============================================================================
+# Firewall Rule Compliance Checks
+# =============================================================================
+firewall_compliance:
+  # Required Rules (these rules must exist)
+  required_rules:
+    - description: "Block RFC1918 on WAN"
+      interface: "wan"
+      action: "block"
+      source: "private"
+      
+    - description: "Allow LAN to Internet"
+      interface: "lan"
+      action: "pass"
+      destination: "any"
+  
+  # Prohibited Rules (these rules must NOT exist)
+  prohibited_rules:
+    - description: "No WAN SSH Access"
+      interface: "wan"
+      action: "pass"
+      destination_port: 22
+      
+    - description: "No WAN Web UI Access"
+      interface: "wan"
+      action: "pass"
+      destination_port: [443, 80]
+
+# =============================================================================
+# Alert Thresholds
+# =============================================================================
+thresholds:
+  # Certificate expiry warnings
+  cert_expiry_critical_days: 7
+  cert_expiry_warning_days: 30
+  
+  # Firewall state table
+  state_table_usage_warning: 80  # Percentage
+  state_table_usage_critical: 95
+  
+  # Interface bandwidth (Mbps)
+  wan_bandwidth_warning: 800
+  wan_bandwidth_critical: 950
+  
+  # System resources
+  cpu_usage_warning: 80  # Percentage
+  memory_usage_warning: 85
+  disk_usage_warning: 90
+
+# =============================================================================
+# Test Execution Settings
+# =============================================================================
+test_settings:
+  # Parallel execution
+  parallel_workers: 4
+  
+  # Timeout settings
+  default_test_timeout: 60  # seconds
+  
+  # Retry failed tests
+  retry_failed: true
+  max_retries: 2
+  
+  # Report generation
+  generate_html_report: true
+  generate_json_report: true
+  report_directory: "./test-reports"
+  
+  # Test markers to run (leave empty to run all)
+  # Examples: critical, security, firewall, system
+  run_markers: []
+  
+  # Test markers to skip
+  skip_markers: []
+
+# =============================================================================
+# Notification Settings (Optional)
+# =============================================================================
+notifications:
+  enabled: false
+  
+  # Email notifications
+  email:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    smtp_user: "alerts@example.com"
+    smtp_password: "your-password"
+    from_address: "opnsense-tests@example.com"
+    to_addresses:
+      - "admin@example.com"
+      - "security@example.com"
+    send_on_failure: true
+    send_summary: true
+  
+  # Slack notifications
+  slack:
+    enabled: false
+    webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    channel: "#security-alerts"
+    send_on_failure: true
+  
+  # Microsoft Teams notifications
+  teams:
+    enabled: false
+    webhook_url: "https://outlook.office.com/webhook/YOUR/WEBHOOK/URL"
+
+# =============================================================================
+# Compliance Frameworks (Optional)
+# =============================================================================
+compliance:
+  # PCI DSS Requirements
+  pci_dss:
+    enabled: false
+    requirements:
+      - "1.1.4"  # Firewall configuration standards
+      - "1.2.1"  # Restrict inbound/outbound traffic
+      - "2.2"    # Configuration standards
+      - "8.2"    # Strong authentication
+  
+  # CIS Benchmarks
+  cis_benchmark:
+    enabled: false
+    version: "1.0"
+  
+  # NIST Cybersecurity Framework
+  nist_csf:
+    enabled: false
+
+# =============================================================================
+# Custom Test Parameters
+# =============================================================================
+custom:
+  # Add any custom parameters your tests need
+  organization: "Example Corp"
+  contact_email: "netadmin@example.com"
+  
+  # Business hours (for testing during maintenance windows)
+  business_hours:
+    start: "08:00"
+    end: "18:00"
+    timezone: "America/New_York"
+  
+  # Maintenance windows (when tests should not alert)
+  maintenance_windows:
+    - day: "Sunday"
+      start: "02:00"
+      end: "06:00"
