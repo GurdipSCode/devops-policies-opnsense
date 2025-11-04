@@ -1,4 +1,4 @@
-# OPNsense Configuration Test Suite
+# devops-policies-opnsense
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![Pytest](https://img.shields.io/badge/pytest-7.0%2B-green.svg)](https://docs.pytest.org/)
